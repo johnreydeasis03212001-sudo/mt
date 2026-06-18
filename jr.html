@@ -224,6 +224,7 @@
                 type: 'video',
                 src: 'media/1/lv_7617285484187897104_20260618140100.mp4',
                 song: 'song/1/Bahala na  kenaniah  Mastermind.mp3',
+                startTime: 25, // <--- NEW! Starts the song exactly at 00:25
                 title: 'Happy 1st Monthsary!',
                 date: 'June 19, 2026'
             },
@@ -233,7 +234,7 @@
         //  🚀  APP LOGIC
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-        // SORTING LOGIC ADDED HERE: Automatically sorts Latest to Oldest based on the 'date' property!
+        // Automatically sorts Latest to Oldest based on the 'date' property
         const mediaList = [...USER_MEDIA].sort((a, b) => new Date(b.date) - new Date(a.date));
         
         let currentIndex = 0;
@@ -306,10 +307,15 @@
             headerContainer.classList.add('animate-fade');
             ambientBackground.classList.add('animate-fade');
 
+            // ── AUDIO START TIME LOGIC ──
             if (item.song) {
                 if (currentSong !== item.song) {
                     bgAudio.src = item.song;
                     currentSong = item.song;
+                    
+                    // Set the start time if one is provided (default to 0)
+                    bgAudio.currentTime = item.startTime || 0; 
+                    
                     if (hasStarted) {
                         bgAudio.muted = false; 
                         bgAudio.play().catch(e => console.log("Audio play error:", e));
