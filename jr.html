@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>❤️ Our Monthsary</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+    <style>
+        /* ────────── Reset & Base ────────── */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #050505; 
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow: hidden; 
+        }
+
+        /* ────────── AMBIENT DYNAMIC BACKGROUND ────────── */
+        .ambient-bg {
+            position: fixed;
+            top: -10%; left: -10%;
+            width: 120%; height: 120%;
+            z-index: -1; 
+            pointer-events: none; 
+            filter: blur(60px) brightness(0.35); 
+            transition: all 0.5s ease;
+        }
+
+        .ambient-bg img, .ambient-bg video {
+            width: 100%; height: 100%;
+            object-fit: cover; 
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            max-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+        }
+
+        /* ────────── START OVERLAY ────────── */
+        #startOverlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: #0f0f0f;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: opacity 0.8s ease;
+        }
+
+        #startOverlay h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        #startOverlay p {
+            font-size: 1.2rem;
+            color: #aaa;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { opacity: 0.4; }
+        }
+
+        /* ────────── Smooth Page Animations ────────── */
+        .animate-fade {
+            animation: smoothFade 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        @keyframes smoothFade {
+            0% { 
+                opacity: 0; 
+                transform: translateY(15px) scale(0.98); 
+            }
+            100% { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
+        }
+
+        /* ────────── Header ────────── */
+        .header { text-align: center; width: 100%; padding: 0 10px; }
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 700;
+            margin: 0;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+        }
+        .header .date {
+            font-size: clamp(0.9rem, 1.5vw, 1.2rem);
+            color: #ddd; 
+            letter-spacing: 2px;
+            margin-top: 4px;
+            font-weight: 300;
+        }
+
+        /* ────────── Media Wrapper ────────── */
+        .media-wrapper {
+            width: 100%; flex: 1 1 auto; 
+            background: rgba(0, 0, 0, 0.4); 
+            border-radius: 20px;
+            overflow: hidden; display: flex; align-items: center; justify-content: center;
+            min-height: 300px; max-height: 65vh; 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+        }
+        .media-wrapper img, .media-wrapper video {
+            width: 100%; height: 100%; object-fit: contain; max-height: 65vh; display: block;
+        }
+        .media-wrapper video::-webkit-media-controls, 
+        .media-wrapper video::-webkit-media-controls-enclosure { display: none !important; }
+
+        #bgAudio { display: none; }
+
+        /* ────────── Footer ────────── */
+        .footer {
+            width: 100%; display: flex; justify-content: space-between;
+            align-items: center; padding: 4px 4px 0; flex-wrap: wrap; gap: 12px;
+        }
+        .footer .pagination-text { color: #ccc; font-size: clamp(0.85rem, 1.2vw, 1rem); }
+        .footer .pagination-text strong { color: #fff; font-weight: 600; }
+        .footer .pagination-buttons { display: flex; align-items: center; gap: 8px; }
+        .footer .pagination-buttons button {
+            background: rgba(42, 42, 42, 0.8); border: none; color: #fff; width: 44px; height: 44px;
+            border-radius: 50%; font-size: 1.2rem; cursor: pointer; transition: all 0.2s ease;
+            display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(4px);
+        }
+        .footer .pagination-buttons button:hover:not(:disabled) {
+            background: rgba(60, 60, 60, 0.9); border-color: #f5576c; transform: scale(1.05);
+        }
+        .footer .pagination-buttons button:disabled { opacity: 0.25; cursor: not-allowed; transform: none; }
+        .footer .pagination-buttons .page-indicators { display: flex; gap: 6px; padding: 0 8px; }
+        .footer .pagination-buttons .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.3); transition: all 0.3s ease; }
+        .footer .pagination-buttons .dot.active { background: #f5576c; width: 24px; border-radius: 12px; }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            body { padding: 12px; }
+            .container { gap: 16px; }
+            .media-wrapper { min-height: 200px; border-radius: 14px; }
+            .footer { flex-direction: column; align-items: center; gap: 8px; }
+            .footer .pagination-buttons button { width: 38px; height: 38px; font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="ambientBackground" class="ambient-bg"></div>
+
+    <div id="startOverlay">
+        <h1>For You ❤️</h1>
+        <p>Tap anywhere to open</p>
+    </div>
+
+    <div class="container" style="display: none;" id="mainContainer">
+        <header class="header" id="headerContainer">
+            <h1 id="mainTitle"></h1>
+            <p class="date" id="mainDate"></p>
+        </header>
+
+        <div class="media-wrapper" id="mediaWrapper">
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <span class="big-icon">📸</span>
+                <h2>Add your memories</h2>
+            </div>
+            <div id="mediaContent" style="display:none; width:100%; height:100%;"></div>
+        </div>
+
+        <audio id="bgAudio" preload="auto">
+            <source src="" type="audio/mpeg">
+        </audio>
+
+        <footer class="footer">
+            <span class="pagination-text" id="paginationText">
+                Viewing <strong id="currentIndexDisplay">0</strong> of <strong id="totalCountDisplay">0</strong>
+            </span>
+            <div class="pagination-buttons">
+                <button id="prevBtn" disabled aria-label="Previous">‹</button>
+                <div class="page-indicators" id="dotContainer"></div>
+                <button id="nextBtn" disabled aria-label="Next">›</button>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  📁  YOUR MEDIA
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        const USER_MEDIA = [
+            {
+                type: 'video',
+                src: 'media/1/lv_7617285484187897104_20260618140100.mp4',
+                song: 'song/1/Bahala na  kenaniah  Mastermind.mp3',
+                title: 'Happy 1st Monthsary!',
+                date: 'June 19, 2026'
+            },
+        ];
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  🚀  APP LOGIC
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        // SORTING LOGIC ADDED HERE: Automatically sorts Latest to Oldest based on the 'date' property!
+        const mediaList = [...USER_MEDIA].sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        let currentIndex = 0;
+        const totalItems = mediaList.length;
+        let hasStarted = false; 
+        let currentSong = ''; 
+
+        // DOM refs
+        const mediaContent = document.getElementById('mediaContent');
+        const emptyState = document.getElementById('emptyState');
+        const mainTitle = document.getElementById('mainTitle');
+        const mainDate = document.getElementById('mainDate');
+        const currentIndexDisplay = document.getElementById('currentIndexDisplay');
+        const totalCountDisplay = document.getElementById('totalCountDisplay');
+        const dotContainer = document.getElementById('dotContainer');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const bgAudio = document.getElementById('bgAudio');
+        const startOverlay = document.getElementById('startOverlay');
+        const mainContainer = document.getElementById('mainContainer');
+        const ambientBackground = document.getElementById('ambientBackground');
+        const headerContainer = document.getElementById('headerContainer');
+
+        // ── Unlock Audio on First Click ──
+        startOverlay.addEventListener('click', () => {
+            hasStarted = true;
+            startOverlay.style.opacity = '0';
+            
+            if (bgAudio.src) {
+                bgAudio.muted = false;
+                bgAudio.play().catch(e => console.log("Audio error:", e));
+            }
+
+            setTimeout(() => {
+                startOverlay.style.display = 'none';
+                mainContainer.style.display = 'flex';
+                document.body.style.overflow = 'auto'; 
+            }, 800);
+        });
+
+        // ── Render Function ──
+        function renderMedia(index) {
+            if (totalItems === 0) {
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            const item = mediaList[index];
+            if (!item) return;
+
+            mediaContent.classList.remove('animate-fade');
+            headerContainer.classList.remove('animate-fade');
+            ambientBackground.classList.remove('animate-fade');
+
+            void mediaContent.offsetWidth; 
+
+            mainTitle.textContent = item.title || '';
+            mainDate.textContent = item.date || '';
+            mediaContent.style.display = 'block';
+
+            if (item.type === 'video') {
+                mediaContent.innerHTML = `<video src="${item.src}" autoplay loop playsinline></video>`;
+                ambientBackground.innerHTML = `<video src="${item.src}" autoplay muted loop playsinline></video>`;
+            } else {
+                mediaContent.innerHTML = `<img src="${item.src}" loading="lazy" />`;
+                ambientBackground.innerHTML = `<img src="${item.src}" />`;
+            }
+
+            mediaContent.classList.add('animate-fade');
+            headerContainer.classList.add('animate-fade');
+            ambientBackground.classList.add('animate-fade');
+
+            if (item.song) {
+                if (currentSong !== item.song) {
+                    bgAudio.src = item.song;
+                    currentSong = item.song;
+                    if (hasStarted) {
+                        bgAudio.muted = false; 
+                        bgAudio.play().catch(e => console.log("Audio play error:", e));
+                    }
+                }
+            } else {
+                bgAudio.pause();
+                currentSong = ''; 
+            }
+
+            currentIndexDisplay.textContent = index + 1;
+            totalCountDisplay.textContent = totalItems;
+
+            dotContainer.innerHTML = '';
+            for (let i = 0; i < totalItems; i++) {
+                const dot = document.createElement('span');
+                dot.className = `dot ${i === index ? 'active' : ''}`;
+                dotContainer.appendChild(dot);
+            }
+
+            prevBtn.disabled = index === 0;
+            nextBtn.disabled = index === totalItems - 1;
+        }
+
+        // ── Navigation ──
+        function goTo(index) {
+            if (index >= 0 && index < totalItems) {
+                currentIndex = index;
+                renderMedia(currentIndex);
+            }
+        }
+
+        prevBtn.addEventListener('click', () => goTo(currentIndex - 1));
+        nextBtn.addEventListener('click', () => goTo(currentIndex + 1));
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') goTo(currentIndex - 1);
+            if (e.key === 'ArrowRight') goTo(currentIndex + 1);
+        });
+
+        renderMedia(0); 
+
+    </script>
+</body>
+</html>
