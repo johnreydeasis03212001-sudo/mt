@@ -224,7 +224,7 @@
                 type: 'video',
                 src: 'media/1/lv_7617285484187897104_20260618140100.mp4',
                 song: 'song/1/Bahala na  kenaniah  Mastermind.mp3',
-                startTime: 27, // <--- NEW! Starts the song exactly at 00:25
+                startTime: 27,
                 title: 'Happy 1st Monthsary!',
                 date: 'June 19, 2026'
             },
@@ -232,7 +232,7 @@
                 type: 'video',
                 src: 'media/2/WhatsApp Video 2026-07-18 at 1.17.16 PM.mp4',
                 song: '',
-                startTime: 27, // <--- NEW! Starts the song exactly at 00:25
+                startTime: 27,
                 title: 'Happy 2nd Monthsary!',
                 date: 'July 19, 2026'
             },
@@ -242,13 +242,13 @@
         //  🚀  APP LOGIC
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-        // Automatically sorts Latest to Oldest based on the 'date' property
         const mediaList = [...USER_MEDIA].sort((a, b) => new Date(b.date) - new Date(a.date));
         
         let currentIndex = 0;
         const totalItems = mediaList.length;
         let hasStarted = false; 
         let currentSong = ''; 
+        let currentVideoElement = null; // Store reference to video element
 
         // DOM refs
         const mediaContent = document.getElementById('mediaContent');
@@ -266,15 +266,32 @@
         const ambientBackground = document.getElementById('ambientBackground');
         const headerContainer = document.getElementById('headerContainer');
 
-        // ── Unlock Audio on First Click ──
+        // ── Function to play video ──
+        function playCurrentVideo() {
+            if (currentVideoElement) {
+                const playPromise = currentVideoElement.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        // If autoplay fails, user will need to click to play
+                        console.log("Video autoplay prevented:", error);
+                    });
+                }
+            }
+        }
+
+        // ── Unlock Audio and Video on First Click ──
         startOverlay.addEventListener('click', () => {
             hasStarted = true;
             startOverlay.style.opacity = '0';
             
+            // Try to play both audio and video on user interaction
             if (bgAudio.src) {
                 bgAudio.muted = false;
                 bgAudio.play().catch(e => console.log("Audio error:", e));
             }
+            
+            // Also try to play the current video
+            playCurrentVideo();
 
             setTimeout(() => {
                 startOverlay.style.display = 'none';
@@ -304,11 +321,22 @@
             mediaContent.style.display = 'block';
 
             if (item.type === 'video') {
-                mediaContent.innerHTML = `<video src="${item.src}" autoplay loop playsinline></video>`;
+                // Create video with muted attribute for autoplay compatibility
+                mediaContent.innerHTML = `<video src="${item.src}" autoplay loop playsinline muted></video>`;
                 ambientBackground.innerHTML = `<video src="${item.src}" autoplay muted loop playsinline></video>`;
+                
+                // Store reference to the video element
+                currentVideoElement = mediaContent.querySelector('video');
+                
+                // If user has already interacted, try to unmute and play
+                if (hasStarted && currentVideoElement) {
+                    currentVideoElement.muted = false;
+                    // Don't autoplay here if already muted, browser might block
+                }
             } else {
                 mediaContent.innerHTML = `<img src="${item.src}" loading="lazy" />`;
                 ambientBackground.innerHTML = `<img src="${item.src}" />`;
+                currentVideoElement = null;
             }
 
             mediaContent.classList.add('animate-fade');
@@ -321,7 +349,6 @@
                     bgAudio.src = item.song;
                     currentSong = item.song;
                     
-                    // Set the start time if one is provided (default to 0)
                     bgAudio.currentTime = item.startTime || 0; 
                     
                     if (hasStarted) {
@@ -357,11 +384,31 @@
         }
 
         prevBtn.addEventListener('click', () => goTo(currentIndex - 1));
-        nextBtn.addEventListener('click', () => goTo(currentIndex + 1));
+        nextBtn.addEventListener('click', () => {
+            goTo(currentIndex + 1);
+            // Play the new video after navigation
+            setTimeout(playCurrentVideo, 100);
+        });
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowLeft') goTo(currentIndex - 1);
-            if (e.key === 'ArrowRight') goTo(currentIndex + 1);
+            if (e.key === 'ArrowRight') {
+                goTo(currentIndex + 1);
+                setTimeout(playCurrentVideo, 100);
+            }
+        });
+
+        // ── Click on media wrapper to play video if paused ──
+        document.getElementById('mediaWrapper').addEventListener('click', () => {
+            if (currentVideoElement) {
+                if (currentVideoElement.paused) {
+                    currentVideoElement.play().catch(e => console.log("Play error:", e));
+                }
+                // Unmute if muted
+                if (currentVideoElement.muted) {
+                    currentVideoElement.muted = false;
+                }
+            }
         });
 
         renderMedia(0); 
